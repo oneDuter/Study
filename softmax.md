@@ -4,27 +4,23 @@ PyTorch 中的 `softmax` 函数与数学公式在理论上是等价的，但在�
 
 ### 1. **数值稳定性优化（减最大值）**
    - **数学公式**：  
-     \[
-     \text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j} e^{x_j}}
-     \]
-     若 \( x_i \) 值较大，\( e^{x_i} \) 可能导致数值溢出（结果为 `inf`）。
+     $$\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j} e^{x_j}}$$
+     若$`x_i`$值较大，$`e^{x_i}`$ 可能导致数值溢出（结果为 `inf`）。
 
    - **PyTorch 实现**：  
      先对输入减去最大值：
-     \[
-     \text{softmax}(x_i) = \frac{e^{x_i - \max(x)}}{\sum_{j} e^{x_j - \max(x)}}
-     \]
+     $`\text{softmax}(x_i) = \frac{e^{x_i - \max(x)}}{\sum_{j} e^{x_j - \max(x)}}`$
      - **原因**：  
-       减去最大值后，指数部分的最大值为 \( e^0 = 1 \)，避免数值溢出，同时保持结果不变（因为分子分母同除 \( e^{\max(x)} \)）。
+       减去最大值后，指数部分的最大值为$`e^0 = 1`$，避免数值溢出，同时保持结果不变（因为分子分母同除$`e^{\max(x)}`$）。
 
 ---
 
 ### 2. **对数空间计算（Log-Softmax）**
    - **PyTorch 提供 `log_softmax`**：  
-     直接计算 \( \log(\text{softmax}(x)) \)，避免先计算 `softmax` 再取对数可能导致的数值精度损失。
-     \[
-     \log(\text{softmax}(x_i)) = x_i - \max(x) - \log\left(\sum_{j} e^{x_j - \max(x)}\right)
-     \]
+     直接计算
+     $\log(\text{softmax}(x))$
+     ，避免先计算 `softmax` 再取对数可能导致的数值精度损失。
+     $$\log(\text{softmax}(x_i)) = x_i - \max(x) - \log\left(\sum_{j} e^{x_j - \max(x)}\right)$$
      - **原因**：  
        1. 提高梯度计算的数值稳定性（尤其在交叉熵损失中）。  
        2. 避免 `softmax` 接近 0 时的浮点精度问题。
